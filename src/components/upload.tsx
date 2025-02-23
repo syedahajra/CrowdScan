@@ -16,8 +16,54 @@ export default function UploadComponent() {
   };
 
   const handleSearch = async () => {
-
-  }
+    if (files.length === 0) {
+      toast.error("No files selected for search.");
+      return;
+    }
+  
+    setsearching(true);
+    const formData = new FormData();
+    files.forEach((file) => formData.append("files", file)); // Append files
+  
+    try {
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+  
+      const result = await response.json();
+  
+      if (response.ok) {
+        toast.success("Files converted to base64!");
+  
+        // Send to Django backend
+        const searchResponse = await fetch("http://localhost:8000/users/find/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ images: result.files }),
+        });
+  
+        const searchResult = await searchResponse.json();
+  
+        if (searchResponse.ok) {
+          toast.success("Search completed successfully!");
+          console.log("Search Result:", searchResult);
+        } else {
+          toast.error(searchResult.error || "Search failed.");
+        }
+      } else {
+        toast.error(result.error || "Conversion to base64 failed.");
+      }
+    } catch (error) {
+      console.error("Search error:", error);
+      toast.error("Search failed. Please try again.");
+    } finally {
+      setsearching(false);
+    }
+  };
+  
   const handleUpload = async () => {
     if (files.length === 0) {
       toast.error("No files selected for upload.");
