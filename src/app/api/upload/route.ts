@@ -22,14 +22,13 @@ export async function POST(req: Request) {
         base64: base64String,
       });
     }
-
     // Send to Django backend
     const djangoResponse = await fetch("http://localhost:8000/users/find/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ images: uploadedFiles }),
+      body: JSON.stringify({ image: uploadedFiles[0].base64 }),
     });
 
     const djangoResult = await djangoResponse.json();

@@ -27,12 +27,12 @@ class CreateUserView(APIView):
         return Response({"message": "User added Successfully."}, status=status.HTTP_200_OK)
 
 class FindUserView(APIView):
-    def get(self, request):
-        encoded_img = request.query_params.get('image')
-        threshold = request.query_params.get('threshold')
-        
+    def post(self, request):
+        encoded_img = request.data.get('image')
+        threshold = request.data.get('threshold')
         if not encoded_img:
             return Response({"error": "Query Image is Required."}, status=status.HTTP_400_BAD_REQUEST)
         
         similar_users = find_users(encoded_img, threshold)
+        print(f"Similar Users: {similar_users[:5]}")
         return Response({"similar_users": similar_users}, status=status.HTTP_200_OK)
