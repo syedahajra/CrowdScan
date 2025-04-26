@@ -9,7 +9,7 @@ from users.models import User
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
-def preprocess_image(encoded_image):
+def decode_image(encoded_image):
     try:
         image_data = base64.b64decode(encoded_image)
         np_arr = np.frombuffer(image_data, np.uint8)
@@ -20,7 +20,7 @@ def preprocess_image(encoded_image):
         raise ValueError("Invalid Base64 image data")
 
 def extract_features(encoded_image, model_name="VGG-Face"):
-    image = preprocess_image(encoded_image)
+    image = decode_image(encoded_image)
     embeddings = DeepFace.represent(image, model_name=model_name, detector_backend="yolov8")
     features = embeddings[0]['embedding']
     return features
@@ -30,7 +30,6 @@ def find_users(encoded_image, threshold):
         threshold = 0.5
     
     query_features = np.array(extract_features(encoded_image=encoded_image)).reshape(1, -1)
-    print(f'Query Features Shape: {query_features.shape}')
     users = User.objects.exclude(feature_vector=None)
     users = users.filter(type="VGG-Face")
     similar_users = []
