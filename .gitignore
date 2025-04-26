@@ -44,3 +44,7 @@ next-env.d.ts
 arcface.h5
 arcface_2.h5
 /All Individuals
+/crowdscan_be/models/
+
+# PyCache Files
+*pyc

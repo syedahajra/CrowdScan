@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     }
 
     // Send images to Django backend
-    const djangoResponse = await fetch("http://localhost:8000/images/upload/", {
+    const djangoResponse = await fetch("http://localhost:8000/users/create/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
