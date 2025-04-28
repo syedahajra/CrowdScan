@@ -9,10 +9,10 @@ MODELS = ["VGG-Face", "ArcFace", "SFace"]
 class CreateUserView(APIView):
     serializer = UserSerializer
     def post(self, request):
-        name = request.data.get('name')
-        address = request.data.get('address')
-        cnic = request.data.get('cnic')
-        encoded_img = request.data.get('image') # Get a base64 encoded image str
+        name = request.data.get('name', "Unknown")
+        address = request.data.get('address', "NA")
+        cnic = request.data.get('cnic', "NA")
+        encoded_img = request.data.get('image')
        
         if not encoded_img:
            return Response({"error": "Image is Required."}, status=status.HTTP_400_BAD_REQUEST)

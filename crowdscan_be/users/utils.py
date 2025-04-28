@@ -6,6 +6,7 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from deepface import DeepFace
 from users.models import User
+from crowdscan_be.Utils.occlusion_detector import FaceOcclusionDetector
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
@@ -19,17 +20,18 @@ def decode_image(encoded_image):
         print("Error in preprocess_image:", str(e))
         raise ValueError("Invalid Base64 image data")
 
-def extract_features(encoded_image, model_name="VGG-Face"):
-    image = decode_image(encoded_image)
-    embeddings = DeepFace.represent(image, model_name=model_name, detector_backend="yolov8")
+def extract_features(decoded_image, model_name="VGG-Face"):
+    embeddings = DeepFace.represent(decoded_image, model_name=model_name, detector_backend="yolov8", enforce_detection=False)
     features = embeddings[0]['embedding']
     return features
 
 def find_users(encoded_image, threshold):
     if not threshold:
         threshold = 0.5
-    
-    query_features = np.array(extract_features(encoded_image=encoded_image)).reshape(1, -1)
+    decoded_image = decode_image(encoded_image)
+    occ_percen = get_occlusion_percentage(decoded_image)
+    print(f"Occlusion Percentage: {occ_percen}")
+    query_features = np.array(extract_features(decoded_image=decoded_image)).reshape(1, -1)
     users = User.objects.exclude(feature_vector=None)
     users = users.filter(type="VGG-Face")
     similar_users = []
@@ -47,3 +49,9 @@ def find_users(encoded_image, threshold):
                 "similarity": similarity
             })
     return similar_users.sort(key=lambda x: x['similarity'], reverse=True)
+
+
+def get_occlusion_percentage(image):
+    occlusion_detector = FaceOcclusionDetector()
+    occlusion_percentage = occlusion_detector.get_occlusion_percentage(image)
+    return occlusion_percentage

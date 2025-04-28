@@ -10,7 +10,7 @@ from PIL import Image
 from .model import BiSeNet
 
 # Define paths
-MODEL_PATH = os.path.join(os.path.dirname(__file__), '79999_iter.pth')
+MODEL_PATH = "/Users/rohan/Documents/University Docs/8th Semester/FYP-II/CrowdScan/crowdscan_be/models/79999_iter.pth"
 
 # Face parsing model init
 class FaceOcclusionDetector:
@@ -49,18 +49,14 @@ class FaceOcclusionDetector:
                     cv2.circle(mask, (x, y), 15, 255, -1)
         return mask
 
-    def get_occlusion_percentage(self, image_path):
-        image_pil = Image.open(image_path).convert('RGB')
-        image_np = cv2.imread(image_path)
-
+    def get_occlusion_percentage(self, image_pil):
+        image_pil = Image.fromarray(image_pil)
+        image_np = np.array(image_pil)
         parsing = self.parse_face(image_pil)
         hand_mask = self.detect_hands(image_np)
-
         face_area = np.sum((parsing > 0) & (parsing != 18))  # 18 is background
         occlusion_mask = np.isin(parsing, [7, 8, 11, 12, 13, 14, 15, 16])  # hair, glasses, etc.
         occlusion_area = np.sum(occlusion_mask)
-
-        # Add hand overlap
         resized_hand_mask = cv2.resize(hand_mask, (parsing.shape[1], parsing.shape[0]))
         occlusion_area += np.sum((resized_hand_mask > 0) & (parsing != 18))
 
