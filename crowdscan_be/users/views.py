@@ -10,21 +10,21 @@ class CreateUserView(APIView):
         name = request.data.get('name', "Unknown")
         address = request.data.get('address', "NA")
         cnic = request.data.get('cnic', "NA")
-        encoded_img = request.data.get('image')
+        encoded_images = request.data.getlist('images', [])
        
-        if not encoded_img:
+        if not encoded_images:
            return Response({"error": "Image is Required."}, status=status.HTTP_400_BAD_REQUEST)
-        
-        for model in MODELS:
-            feature_vector = extract_features(encoded_img, model_name=model)
-            User.objects.create(
-                name=name,
-                cnic_number=cnic,
-                address=address,
-                image=encoded_img,
-                feature_vector=feature_vector,
-                type=model
-            )
+        for encoded_img in encoded_images:
+            for model in MODELS:
+                feature_vector = extract_features(encoded_img, model_name=model)
+                User.objects.create(
+                    name=name,
+                    cnic_number=cnic,
+                    address=address,
+                    image=encoded_img,
+                    feature_vector=feature_vector,
+                    type=model
+                )
         return Response({"message": "User added Successfully.", "name": name}, status=status.HTTP_201_CREATED)
 class FindUserView(APIView):
     def post(self, request):
