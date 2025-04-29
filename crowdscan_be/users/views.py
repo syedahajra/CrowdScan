@@ -10,7 +10,7 @@ class CreateUserView(APIView):
         name = request.data.get('name', "Unknown")
         address = request.data.get('address', "NA")
         cnic = request.data.get('cnic', "NA")
-        encoded_images = request.data.getlist('images', [])
+        encoded_images = request.data.get('images', [])
        
         if not encoded_images:
            return Response({"error": "Image is Required."}, status=status.HTTP_400_BAD_REQUEST)

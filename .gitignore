@@ -45,6 +45,7 @@ arcface.h5
 arcface_2.h5
 /All Individuals
 test*
+add*
 
 # PyCache Files
-*pyc
+*.pyc*
