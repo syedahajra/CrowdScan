@@ -2,12 +2,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from users.models import User
-from users.serializers import UserSerializer
 from users.utils import extract_features, find_users
 
 MODELS = ["VGG-Face", "ArcFace", "SFace"]
 class CreateUserView(APIView):
-    serializer = UserSerializer
     def post(self, request):
         name = request.data.get('name', "Unknown")
         address = request.data.get('address', "NA")
@@ -27,7 +25,6 @@ class CreateUserView(APIView):
                 feature_vector=feature_vector,
                 type=model
             )
-            cnic+=1
         return Response({"message": "User added Successfully.", "name": name}, status=status.HTTP_201_CREATED)
 class FindUserView(APIView):
     def post(self, request):
@@ -41,5 +38,20 @@ class FindUserView(APIView):
 
 class CreateBulkUsersView(APIView):
     def post(self, request):
-        users = request.data.get('users')
-        pass
+        encoded_images = request.data.get('images', [])
+        if not encoded_images:
+            return Response({"error": "Images are Required."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        for image in encoded_images:
+            for model in MODELS:
+                feature_vector = extract_features(image, model_name=model)
+                User.objects.create(
+                    name="Unknown",
+                    cnic_number="NA",
+                    address="NA",
+                    image=image,
+                    feature_vector=feature_vector,
+                    type=model
+                )
+        return Response({"message": "Users added Successfully."}, status=status.HTTP_201_CREATED)
+        

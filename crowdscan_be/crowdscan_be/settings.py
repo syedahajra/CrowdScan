@@ -80,9 +80,9 @@ WSGI_APPLICATION = "crowdscan_be.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        'NAME': 'crowdscan',  # Replace with your database name
-        'USER': 'rohan',  # Replace with your database user
-        'PASSWORD': '',  # Replace with your database password
+        'NAME': 'crowdscan',  
+        'USER': 'rohan',  
+        'PASSWORD': '',  
         'HOST': 'localhost',
         'PORT': '5432',
     }

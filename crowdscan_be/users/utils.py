@@ -3,12 +3,20 @@ import numpy as np
 import cv2
 from PIL import ImageFile
 import numpy as np
+from tensorflow.keras.models import load_model
 from sklearn.metrics.pairwise import cosine_similarity
 from deepface import DeepFace
 from users.models import User
 from crowdscan_be.Utils.occlusion_detector import FaceOcclusionDetector
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
+
+arcface_finetuned = load_model("./models/arcface.h5", custom_objects=None, compile=True, safe_mode=True)
+
+def get_occlusion_percentage(image):
+    occlusion_detector = FaceOcclusionDetector()
+    occlusion_percentage = occlusion_detector.get_occlusion_percentage(image)
+    return occlusion_percentage
 
 def decode_image(encoded_image):
     try:
@@ -21,6 +29,9 @@ def decode_image(encoded_image):
         raise ValueError("Invalid Base64 image data")
 
 def extract_features(decoded_image, model_name="VGG-Face"):
+    if model_name == "ArcFace":
+        features = arcface_finetuned.predict(decoded_image)
+        return features
     embeddings = DeepFace.represent(decoded_image, model_name=model_name, detector_backend="yolov8", enforce_detection=False)
     features = embeddings[0]['embedding']
     return features
@@ -28,9 +39,12 @@ def extract_features(decoded_image, model_name="VGG-Face"):
 def find_users(encoded_image, threshold):
     if not threshold:
         threshold = 0.5
+    
     decoded_image = decode_image(encoded_image)
     occ_percen = get_occlusion_percentage(decoded_image)
+    
     print(f"Occlusion Percentage: {occ_percen}")
+    
     query_features = np.array(extract_features(decoded_image=decoded_image)).reshape(1, -1)
     users = User.objects.exclude(feature_vector=None)
     users = users.filter(type="VGG-Face")
@@ -49,9 +63,3 @@ def find_users(encoded_image, threshold):
                 "similarity": similarity
             })
     return similar_users.sort(key=lambda x: x['similarity'], reverse=True)
-
-
-def get_occlusion_percentage(image):
-    occlusion_detector = FaceOcclusionDetector()
-    occlusion_percentage = occlusion_detector.get_occlusion_percentage(image)
-    return occlusion_percentage
