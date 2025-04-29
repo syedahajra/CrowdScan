@@ -18,7 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/theme-toggler";
 import { ImagePlus } from "lucide-react";
-import ScanResults from "@/components/scan-results";
+// import ScanResults from "@/components/scan-results";
 import SensitivitySlider  from "@/components/sensitivity";
 
 interface UploadedFile {
@@ -47,7 +47,7 @@ export default function Page() {
     selectedFiles.forEach((file) => formData.append("images", file));
 
     try {
-      const response = await fetch("/api/upload/route.ts", {
+      const response = await fetch("/api/upload", {
         method: "POST",
         body: formData,
       });
@@ -162,7 +162,8 @@ export default function Page() {
             </div>
           </div>
         ) : (
-          <ScanResults handleBack={handleBack} />
+          // <ScanResults handleBack={handleBack} />
+          <div></div>
         )}
       </SidebarInset>
       <ModeToggle />

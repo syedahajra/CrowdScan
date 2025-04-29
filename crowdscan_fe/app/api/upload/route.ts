@@ -1,50 +1,32 @@
 import { NextResponse } from "next/server";
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const formData = await req.formData();
-    const files = formData.getAll("files") as File[];
+    const payload = await request.json();
 
-    // Validation check for file upload
-    if (!files || files.length === 0) {
-      return NextResponse.json({ error: "No files uploaded" }, { status: 400 });
-    }
-
-    const uploadedFiles: { name: string; base64: string }[] = [];
-
-    for (const file of files) {
-      const bytes = await file.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-      const base64String = buffer.toString("base64");
-
-      uploadedFiles.push({
-        name: file.name,
-        base64: base64String,
-      });
-    }
-
-    // Send images to Django backend
     const djangoResponse = await fetch("http://localhost:8000/users/create/", {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ images: uploadedFiles.map(file => file.base64) }),
+      body: JSON.stringify(payload),
     });
-
-    const djangoResult = await djangoResponse.json();
 
     if (!djangoResponse.ok) {
-      return NextResponse.json({ error: djangoResult.error }, { status: djangoResponse.status });
+      const errorData = await djangoResponse.json();
+      return NextResponse.json({ error: errorData.error || "Upload failed" }, { status: djangoResponse.status });
     }
 
-    return NextResponse.json({
-      message: "Image upload completed successfully",
-      result: djangoResult,
-    });
+    return NextResponse.json(await djangoResponse.json());
 
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: "Image upload failed" }, { status: 500 });
+  } catch (error: unknown) {
+    console.error('Upload error:', error);
+    return NextResponse.json(
+      {
+        error: "Internal server error",
+        details: error instanceof Error ? error.message : String(error)
+      },
+      { status: 500 }
+    );
   }
 }
