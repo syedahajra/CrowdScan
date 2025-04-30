@@ -29,10 +29,44 @@ export default function ScanPage() {
     setFiles(acceptedFiles);
   };
 
-  const handleScan = () => {
-    // In a real app, you would upload files and process them first
+  // Update the handleScan function in your page.tsx
+// Update the handleScan function in your scan page.tsx
+const handleScan = async () => {
+  try {
+    const formData = new FormData();
+    files.forEach(file => formData.append('files', file));
+
+    // Store the uploaded images as data URLs
+    const imageUrls = await Promise.all(
+      files.map(file => {
+        return new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.readAsDataURL(file);
+        });
+      })
+    );
+
+    localStorage.setItem('scannedImages', JSON.stringify(imageUrls));
+
+    const response = await fetch('/api/scan', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error('Scan failed');
+    }
+
+    const data = await response.json();
+    // Store results and navigate to results page
+    localStorage.setItem('scanResults', JSON.stringify(data.matches));
     router.push("/scan/results");
-  };
+  } catch (error) {
+    console.error('Scan error:', error);
+    // Handle error (e.g., show toast notification)
+  }
+};
 
   return (
     <SidebarProvider>

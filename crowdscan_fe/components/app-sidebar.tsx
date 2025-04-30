@@ -5,11 +5,13 @@ import {
   AudioWaveform,
   BookOpen,
   Bot,
+  CloudUpload,
   Command,
   Frame,
   GalleryVerticalEnd,
   Map,
   PieChart,
+  ScanSearch,
   Settings2,
   SquareTerminal,
 } from "lucide-react"
@@ -54,7 +56,7 @@ const data = {
     {
       title: "Upload to Database",
       url: "/UploadImages",
-      icon: SquareTerminal,
+      icon: CloudUpload,
       isActive: true,
       // items: [
       //   {
@@ -74,7 +76,7 @@ const data = {
     {
       title: "Match Faces",
       url: "scan",
-      icon: Bot,
+      icon: ScanSearch,
     //   items: [
     //     {
     //       title: "Genesis",
