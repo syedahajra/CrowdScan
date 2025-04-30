@@ -6,7 +6,7 @@ import numpy as np
 from tensorflow.keras.models import load_model
 from sklearn.metrics.pairwise import cosine_similarity
 from deepface import DeepFace
-from users.models import User
+from users.models import Features, User
 from crowdscan_be.Utils.occlusion_detector import FaceOcclusionDetector
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
@@ -44,18 +44,19 @@ def extract_features(encoded_image, model_name="ArcFace"):
     features = embeddings[0]['embedding']
     return features
 
-def find_users(encoded_image, threshold):    
+def find_users(encoded_image, threshold):  
+    model_name = "ArcFace"
     query_features = np.array(extract_features(encoded_image=encoded_image)).reshape(1, -1)
-    users = User.objects.exclude(feature_vector=None)
-    users = users.filter(type="ArcFace")
+    features = Features.objects.filter(model_name=model_name).exclude(feature_vector=None)
     similar_users = []
     if not threshold:
-        threshold = thresholds["ArcFace"]
+        threshold = thresholds[model_name]
     
-    for user in users:
-        stored_features = np.array(user.feature_vector).reshape(1, -1)
+    for feature in features:
+        stored_features = np.array(feature.feature_vector).reshape(1, -1)
         similarity = cosine_similarity(query_features, stored_features)[0][0]
         if similarity >= threshold:
+            user = User.objects.get(id=feature.user.id)
             similar_users.append({
                 "name": user.name,
                 "address": user.address,

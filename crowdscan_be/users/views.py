@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from users.models import User
+from users.models import User, Features
 from users.utils import extract_features, find_users
 
 MODELS = ["VGG-Face", "ArcFace", "SFace"]
@@ -15,15 +15,22 @@ class CreateUserView(APIView):
         if not encoded_images:
            return Response({"error": "Image is Required."}, status=status.HTTP_400_BAD_REQUEST)
         for encoded_img in encoded_images:
+            try:
+                user_obj = User.objects.create(
+                    name = name,
+                    address = address,
+                    cnic_number = cnic,
+                    image = encoded_img
+                )
+            except Exception as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            
             for model in MODELS:
                 feature_vector = extract_features(encoded_img, model_name=model)
-                User.objects.create(
-                    name=name,
-                    cnic_number=cnic,
-                    address=address,
-                    image=encoded_img,
-                    feature_vector=feature_vector,
-                    type=model
+                Features.objects.create(
+                    user = user_obj,
+                    feature_vector = feature_vector,
+                    model_name = model
                 )
         return Response({"message": "User added Successfully.", "name": name}, status=status.HTTP_201_CREATED)
 class FindUserView(APIView):
