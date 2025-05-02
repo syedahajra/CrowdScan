@@ -75,7 +75,7 @@ const data = {
   projects: [
     {
       name: "Manage Users",
-      url: "scan",
+      url: "manageUsers",
       icon: Users,
     },
   ],

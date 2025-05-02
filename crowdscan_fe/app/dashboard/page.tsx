@@ -1,172 +1,171 @@
 "use client";
-import { useState } from "react";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Upload, Scan, Users, SlidersHorizontal,ClipboardList } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { AppSidebar } from "@/components/app-sidebar";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator";
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
-  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
-import { ModeToggle } from "@/components/theme-toggler";
-import { ImagePlus } from "lucide-react";
-// import ScanResults from "@/components/scan-results";
-import SensitivitySlider  from "@/components/sensitivity";
 
-interface UploadedFile {
-  name: string;
-  path: string;
-}
+export default function DashboardPage() {
+  const router = useRouter();
 
-export default function Page() {
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
-  const [viewResults, setViewResults] = useState(false);
-  const [sensitivity, setSensitivity] = useState(50);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    setSelectedFiles(files);
-    const urls = files.map((file) => URL.createObjectURL(file));
-    setPreviewUrls(urls);
+  const navigateTo = (path: string) => {
+    router.push(path);
   };
 
-  const handleUpload = async () => {
-    if (selectedFiles.length === 0) return;
-
-    const formData = new FormData();
-    selectedFiles.forEach((file) => formData.append("images", file));
-
-    try {
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        setUploadedFiles(result.uploads);
-        console.log("Upload successful:", result);
-      } else {
-        console.error("Upload failed:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error uploading images:", error);
-    }
-  };
-
-  const handleScan = () => {
-    setViewResults(true);
-  };
-  const handleBack = () => {
-    setViewResults(false);
-  };
-  
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-16 items-center gap-2">
-          <div className="flex items-center gap-2 px-4">
+      <SidebarInset className="min-h-screen">
+        <header className="flex h-16 items-center gap-2 border-b px-4">
+          <div className="flex items-center gap-2">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
             <Breadcrumb>
               <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
-                    Building Your Application
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
+                  <BreadcrumbPage>Dashboard</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
           </div>
         </header>
-        {!viewResults ? (
-          <div className="grid grid-cols-4 gap-4 h-screen p-4">
-            <div className="col-span-3 grid grid-rows-3 gap-4">
-              <div className="row-span-1 flex flex-col rounded-xl bg-muted/50 p-6">
-                <h1 className="text-3xl font-bold">Upload & Scan Images</h1>
-                <p className="text-sm mt-1 text-muted-foreground">
-                  Easily upload images and start scanning with just a click
-                </p>
 
-                <div className="mt-4 flex flex-row gap-6 items-center">
-                  <div
-                    className="aspect-square w-64 rounded-xl bg-accent p-6 flex flex-col justify-center cursor-pointer"
-                    onClick={() =>
-                      document.getElementById("fileInput")?.click()
-                    }
-                  >
-                    <input
-                      id="fileInput"
-                      type="file"
-                      className="hidden"
-                      accept="image/*"
-                      multiple
-                      onChange={handleFileChange}
-                    />
-                    <ImagePlus className="w-14 h-14" />
-                    <h2 className="text-3xl font-bold mt-4">
-                      {selectedFiles.length}
-                    </h2>
-                    <p className="text-gray-400">
-                      {selectedFiles.length > 0
-                        ? "Images Selected"
-                        : "Click to select images"}
-                    </p>
-                  </div>
+        <main className="p-6 space-y-8">
+          {/* Welcome Section */}
+          <section className="space-y-2">
+            <h1 className="text-3xl font-bold">Welcome to Crowd Scan</h1>
+            <p className="text-muted-foreground">
+              Facial Recognition System for Law Enforcement
+            </p>
+            <p className="max-w-2xl">
+              Crowd Scan helps you match suspects against databases using advanced
+              AI models. Upload images, run matches, and manage identities in one
+              secure platform.
+            </p>
+          </section>
 
-                  {previewUrls.length > 0 && (
-                    <div className="grid grid-cols-4 grid-rows-2 gap-2">
-                      {previewUrls.map((url, index) => (
-                        <img
-                          key={index}
-                          src={url}
-                          alt="Preview"
-                          className="w-32 h-32 rounded-lg object-cover"
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <div className="w-64 mt-4 flex gap-4">
-                  <Button className="flex-1" onClick={handleUpload}>
-                    Upload
-                  </Button>
-                  <Button className="flex-1" onClick={handleScan} type="submit">
-                    Scan
-                  </Button>
-                </div>
+          {/* Quick Actions */}
+          <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Button
+              variant="outline"
+              className="h-24 flex-col gap-2"
+              onClick={() => navigateTo("/UploadImages")}
+            >
+              <Upload className="h-6 w-6" />
+              <span>Upload Images</span>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-24 flex-col gap-2"
+              onClick={() => navigateTo("/scan")}
+            >
+              <Scan className="h-6 w-6" />
+              <span>Match Faces</span>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-24 flex-col gap-2"
+              onClick={() => navigateTo("/manageUsers")}
+            >
+              <Users className="h-6 w-6" />
+              <span>Manage Users</span>
+            </Button>
+            {/* <Button
+              variant="outline"
+              className="h-24 flex-col gap-2"
+              onClick={() => navigateTo("/settings")}
+            >
+              <Settings className="h-6 w-6" />
+              <span>Settings</span>
+            </Button> */}
+          </section>
+
+          {/* How It Works */}
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">How Crowd Scan Works</h2>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <Card>
+                <CardHeader className="font-medium">
+                  <Upload className="h-5 w-5 mb-2" />
+                  Step 1: Upload Images
+                </CardHeader>
+                <CardContent className="text-sm text-muted-foreground">
+                  Add known (suspects) or unknown (crowd) images to the database
+                  through the Upload section.
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="font-medium">
+                  <Scan className="h-5 w-5 mb-2" />
+                  Step 2: Match Faces
+                </CardHeader>
+                <CardContent className="text-sm text-muted-foreground">
+                  Run facial recognition scans to find matches between unknown
+                  and known images.
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="font-medium">
+                  <ClipboardList className="h-5 w-5 mb-2" />
+                  Step 3: Review Results
+                </CardHeader>
+                <CardContent className="text-sm text-muted-foreground">
+                  View match confidence scores and potential identifications with
+                  visual comparisons.
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="font-medium">
+                  <SlidersHorizontal className="h-5 w-5 mb-2" />
+                  Step 4: Adjust Settings
+                </CardHeader>
+                <CardContent className="text-sm text-muted-foreground">
+                  Fine-tune matching thresholds and algorithm parameters for
+                  optimal results.
+                </CardContent>
+              </Card>
+            </div>
+          </section>
+
+          {/* Threshold Tips */}
+          <section className="bg-secondary/50 p-6 rounded-lg border">
+            <h2 className="text-xl font-semibold mb-2">
+              Matching Threshold Guidance
+            </h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <h3 className="font-medium mb-1">Lower Threshold (~0.5)</h3>
+                <ul className="text-sm text-muted-foreground list-disc pl-5">
+                  <li>More potential matches</li>
+                  <li>Higher false positive rate</li>
+                  <li>Good for initial broad searches</li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-medium mb-1">Higher Threshold (~0.8)</h3>
+                <ul className="text-sm text-muted-foreground list-disc pl-5">
+                  <li>Fewer but more accurate matches</li>
+                  <li>Lower false positive rate</li>
+                  <li>Good for conclusive verification</li>
+                </ul>
               </div>
             </div>
-
-            <div>
-              <SensitivitySlider value={sensitivity} onChange={setSensitivity}/>
-              <div className="rounded-xl bg-muted/50 p-4">
-                <h1 className="text-1xl font-bold">Recent Match</h1>
-                <p>Confidence Score 85%</p>
-              </div>
-            </div>
-          </div>
-        ) : (
-          // <ScanResults handleBack={handleBack} />
-          <div></div>
-        )}
+          </section>
+        </main>
       </SidebarInset>
-      <ModeToggle />
     </SidebarProvider>
   );
 }
