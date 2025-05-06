@@ -1,15 +1,16 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from users.models import User, Features
+from users.models import User, Features, Administrators, ScanHistory
+from users.serializers import AdministratorSerializer, ScanHistorySerializer
 from users.utils import extract_features, find_users
 
 MODELS = ["VGG-Face", "ArcFace", "SFace"]
 class CreateUserView(APIView):
     def post(self, request):
-        name = request.data.get('name', "Unknown")
-        address = request.data.get('address', "NA")
-        cnic = request.data.get('cnic', "NA")
+        name = request.data.get('name')
+        address = request.data.get('address')
+        cnic = request.data.get('cnic')
         encoded_images = request.data.get('images', [])
        
         if not encoded_images:
@@ -43,22 +44,18 @@ class FindUserView(APIView):
         similar_users = find_users(encoded_img, threshold)
         return Response({"similar_users": similar_users}, status=status.HTTP_200_OK)
 
-class CreateBulkUsersView(APIView):
+
+class CreateAdminView(APIView):
+    serializer_class = AdministratorSerializer
     def post(self, request):
-        encoded_images = request.data.get('images', [])
-        if not encoded_images:
-            return Response({"error": "Images are Required."}, status=status.HTTP_400_BAD_REQUEST)
-        
-        for image in encoded_images:
-            for model in MODELS:
-                feature_vector = extract_features(image, model_name=model)
-                User.objects.create(
-                    name="Unknown",
-                    cnic_number="NA",
-                    address="NA",
-                    image=image,
-                    feature_vector=feature_vector,
-                    type=model
-                )
-        return Response({"message": "Users added Successfully."}, status=status.HTTP_201_CREATED)
-        
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Admin created successfully."}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class GetScanHistoryView(APIView):
+    def get(self, request):
+        queryset = ScanHistory.objects.all(scanned_by=request.user)
+        serializer = ScanHistorySerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
