@@ -16,6 +16,7 @@ import {
   Settings2,
   SquareTerminal,
   Users,
+  CircleHelp
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -77,6 +78,11 @@ const data = {
       name: "Manage Users",
       url: "manageUsers",
       icon: Users,
+    },
+    {
+      name: "How it works",
+      url: "Manual",
+      icon: CircleHelp,
     },
   ],
 };
