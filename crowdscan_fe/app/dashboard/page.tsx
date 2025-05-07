@@ -29,6 +29,7 @@ import {
   AlertCircle,
   Camera
 } from "lucide-react";
+import { ModeToggle } from "@/components/theme-toggler";
 
 export default function DashboardPage() {
   return (
@@ -46,7 +47,7 @@ export default function DashboardPage() {
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
-          </div>
+          </div><ModeToggle/>
         </header>
 
         <main className="p-6">
@@ -133,7 +134,9 @@ export default function DashboardPage() {
             </div>
           </div>
         </main>
+        
       </SidebarInset>
+      
     </SidebarProvider>
   );
 }

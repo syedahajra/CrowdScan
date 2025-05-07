@@ -18,6 +18,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
+import { ModeToggle } from "@/components/theme-toggler";
 
 export default function ManualPage() {
   const router = useRouter();
@@ -186,7 +187,7 @@ export default function ManualPage() {
               </div>
             </div>
 
-            <div className="mt-6 p-4 bg-white rounded-lg">
+            <div className="mt-6 p-4  rounded-lg">
               <h4 className="font-medium mb-2">Remember:</h4>
               <ul className="text-sm space-y-1">
                 <li>• <strong>Lower numbers (0.5)</strong> = More matches, but maybe wrong ones</li>
@@ -197,6 +198,7 @@ export default function ManualPage() {
           </section>
         </main>
       </SidebarInset>
+      <ModeToggle />
     </SidebarProvider>
   );
 }

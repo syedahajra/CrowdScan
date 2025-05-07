@@ -52,6 +52,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { ModeToggle } from "@/components/theme-toggler";
 
 type User = {
   id: string;
@@ -277,6 +278,7 @@ export default function ManageUsersPage() {
           </div>
         </main>
       </SidebarInset>
+      <ModeToggle />
     </SidebarProvider>
   );
 }
