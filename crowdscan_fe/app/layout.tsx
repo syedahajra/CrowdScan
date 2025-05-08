@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'CrowdScan - Facial Recognition System', // Change this
+  title: 'CrowdScan', // Change this
   description: 'Law enforcement face matching tool',
 };
 

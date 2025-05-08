@@ -3,13 +3,12 @@
 import * as React from "react";
 import {
   CloudUpload,
-  GalleryVerticalEnd,
   LayoutDashboard,
   ScanSearch,
   Users,
   CircleHelp
 } from "lucide-react";
-
+import Image from "next/image"; // Add this import
 import { NavMain } from "@/components/nav-main";
 import { NavProjects } from "@/components/nav-projects";
 import { NavUser } from "@/components/nav-user";
@@ -32,7 +31,7 @@ const data = {
   teams: [
     {
       name: "CrowdScan",
-      logo: GalleryVerticalEnd,
+      logo: "/logo-removebg.png", // Changed from icon to image path
       plan: "Face Recognition System",
     },
   ],
@@ -72,7 +71,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <TeamSwitcher 
+          teams={data.teams.map(team => ({
+            ...team,
+            // Custom renderer for the logo
+            renderLogo: () => (
+              <div className="relative h-8 w-8">
+                <Image
+                  src={team.logo}
+                  alt={`${team.name} logo`}
+                  fill
+                  className="object-contain"
+                />
+              </div>
+            )
+          }))} 
+        />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
