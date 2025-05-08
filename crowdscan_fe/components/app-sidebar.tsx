@@ -2,19 +2,10 @@
 
 import * as React from "react";
 import {
-  AudioWaveform,
-  BookOpen,
-  Bot,
   CloudUpload,
-  Command,
-  Frame,
   GalleryVerticalEnd,
   LayoutDashboard,
-  Map,
-  PieChart,
   ScanSearch,
-  Settings2,
-  SquareTerminal,
   Users,
   CircleHelp
 } from "lucide-react";
@@ -40,20 +31,10 @@ const data = {
   },
   teams: [
     {
-      name: "CrowdScan Inc",
+      name: "CrowdScan",
       logo: GalleryVerticalEnd,
-      plan: "Enterprise",
+      plan: "Face Recognition System",
     },
-    //   {
-    //     name: "Acme Corp.",
-    //     logo: AudioWaveform,
-    //     plan: "Startup",
-    //   },
-    //   {
-    //     name: "Evil Corp.",
-    //     logo: Command,
-    //     plan: "Free",
-    //   },
   ],
   navMain: [
     {

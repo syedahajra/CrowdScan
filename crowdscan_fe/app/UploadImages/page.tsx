@@ -3,6 +3,7 @@ import { useState, useCallback } from "react";
 import { FileUpload } from "@/components/file-upload";
 import { Button } from "@/components/ui/button";
 import { ImagePlus, User, Users, X, LoaderCircle } from "lucide-react";
+import { toast } from "sonner";
 import { AppSidebar } from "@/components/app-sidebar";
 import { ModeToggle } from "@/components/theme-toggler";
 import {
@@ -49,8 +50,25 @@ export default function UploadPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Add these submit handlers
+  const validateCNIC = (cnic: string) => {
+    const cnicRegex = /^\d{5}-\d{7}-\d{1}$/;
+    return cnicRegex.test(cnic);
+  };
+
   const handleSubmit = async () => {
+    // Validate before submission
+    if (activeTab === 'known') {
+      if (!name && !cnic) {
+        toast.error('At least one of Name or CNIC is required');
+        return;
+      }
+      
+      if (cnic && !validateCNIC(cnic)) {
+        toast.error('CNIC must be in format 42201-9917151-6');
+        return;
+      }
+    }
+
     setIsLoading(true);
     setError('');
   
@@ -170,38 +188,45 @@ export default function UploadPage() {
 
           {/* Known Person Form */}
           {activeTab === "known" && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium">Full Name</label>
-                  <input
-                    className="w-full p-2 border rounded"
-                    placeholder="Enter full name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium">
-                    CNIC Number
-                  </label>
-                  <input
-                    className="w-full p-2 border rounded"
-                    placeholder="Enter CNIC"
-                    value={cnic}
-                    onChange={(e) => setCnic(e.target.value)}
-                  />
-                </div>
-              </div>
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="block text-sm font-medium">Address</label>
+                <label className="block text-sm font-medium">
+                  Full Name <span className="text-muted-foreground">(optional if CNIC provided)</span>
+                </label>
                 <input
                   className="w-full p-2 border rounded"
-                  placeholder="Enter address"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="e.g. Muhammad Ali"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                 />
               </div>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium">
+                  CNIC Number <span className="text-muted-foreground">(optional if name provided)</span>
+                </label>
+                <input
+                  className="w-full p-2 border rounded"
+                  placeholder="42201-9917151-6"
+                  value={cnic}
+                  onChange={(e) => setCnic(e.target.value)}
+                />
+                {cnic && !validateCNIC(cnic) && (
+                  <p className="text-xs text-red-500">
+                    CNIC must be in format 42201-9917151-6
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Address</label>
+              <input
+                className="w-full p-2 border rounded"
+                placeholder="House #, Street, City"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+              />
+            </div>
 
               <FileUpload
                 onDrop={handleKnownDrop}
