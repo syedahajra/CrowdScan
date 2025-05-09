@@ -1,11 +1,13 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from users.models import User, Features, Administrators, ScanHistory
-from users.serializers import AdministratorSerializer, ScanHistorySerializer
+from users.models import User, Features, ScanHistory
+from users.serializers import ScanHistorySerializer
 from users.utils import extract_features, find_users
 
+
 MODELS = ["VGG-Face", "ArcFace", "SFace"]
+
 class CreateUserView(APIView):
     def post(self, request):
         name = request.data.get('name')
@@ -34,25 +36,15 @@ class CreateUserView(APIView):
                     model_name = model
                 )
         return Response({"message": "User added Successfully.", "name": name}, status=status.HTTP_201_CREATED)
+
 class FindUserView(APIView):
     def post(self, request):
-        encoded_img = request.data.get('image')
+        encoded_images = request.data.get('images', [])
+        if not encoded_images:
+            return Response({"error": "At least one image is required."}, status=status.HTTP_400_BAD_REQUEST)
         threshold = request.data.get('threshold')
-        if not encoded_img:
-            return Response({"error": "Query Image is Required."}, status=status.HTTP_400_BAD_REQUEST)
-        
-        similar_users = find_users(encoded_img, threshold)
-        return Response({"similar_users": similar_users}, status=status.HTTP_200_OK)
-
-
-class CreateAdminView(APIView):
-    serializer_class = AdministratorSerializer
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"message": "Admin created successfully."}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        results = find_users(encoded_images, threshold)
+        return Response({"results": results}, status=status.HTTP_200_OK)
     
 class GetScanHistoryView(APIView):
     def get(self, request):

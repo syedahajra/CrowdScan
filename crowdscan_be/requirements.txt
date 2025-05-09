@@ -24,3 +24,6 @@ torchvision==0.15.2
 mediapipe==0.10.9
 ultralytics
 gunicorn
+
+# Session Management
+jwt

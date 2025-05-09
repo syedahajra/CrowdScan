@@ -44,25 +44,44 @@ def extract_features(encoded_image, model_name="ArcFace"):
     features = embeddings[0]['embedding']
     return features
 
-def find_users(encoded_image, threshold):  
-    model_name = "ArcFace"
-    query_features = np.array(extract_features(encoded_image=encoded_image)).reshape(1, -1)
-    features = Features.objects.filter(model_name=model_name).exclude(feature_vector=None)
-    similar_users = []
-    if not threshold:
-        threshold = thresholds[model_name]
+def find_users(encoded_images, threshold):
+    all_results = []
     
-    for feature in features:
-        stored_features = np.array(feature.feature_vector).reshape(1, -1)
-        similarity = cosine_similarity(query_features, stored_features)[0][0]
-        if similarity >= threshold:
-            user = User.objects.get(id=feature.user.id)
-            similar_users.append({
-                "name": user.name,
-                "address": user.address,
-                "cnic_number": user.cnic_number,
-                "image": user.image,
-                "similarity": similarity
-            })
-    similar_users = sorted(similar_users, key=lambda x: x['similarity'], reverse=True)
-    return similar_users[:5]
+    for encoded_image in encoded_images:
+        occ_per = get_occlusion_percentage(decode_image(encoded_image))
+
+        if occ_per > 0.6:
+            model_name = "ArcFace"
+        elif occ_per > 0.3:
+            model_name = "SFace"
+        else:
+            model_name = "VGG-Face"
+
+        query_features = np.array(extract_features(encoded_image=encoded_image, model_name=model_name)).reshape(1, -1)
+        features = Features.objects.filter(model_name=model_name).exclude(feature_vector=None)
+        similar_users = []
+        if not threshold:
+            threshold = thresholds[model_name]
+        
+        for feature in features:
+            stored_features = np.array(feature.feature_vector).reshape(1, -1)
+            similarity = cosine_similarity(query_features, stored_features)[0][0]
+            if similarity >= threshold:
+                user = User.objects.get(id=feature.user.id)
+                similar_users.append({
+                    "name": user.name,
+                    "address": user.address,
+                    "cnic_number": user.cnic_number,
+                    "image": user.image,
+                    "similarity": similarity,
+                    "model_used": model_name,
+                    "occlusion_percentage": occ_per,
+                })
+        similar_users = sorted(similar_users, key=lambda x: x['similarity'], reverse=True)
+        all_results.append({
+            "image_index": len(all_results),
+            "query_image": encoded_image,
+            "matches": similar_users[:15]
+        })
+    
+    return all_result
