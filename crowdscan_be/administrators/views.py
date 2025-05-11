@@ -19,7 +19,9 @@ class CreateUpdateRetrieveDeleteAdminView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            print(serializer.errors)  # Add this line
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request, *args, **kwargs):
         try:
@@ -50,28 +52,20 @@ class CreateUpdateRetrieveDeleteAdminView(APIView):
             )
     
     def get(self, request, *args, **kwargs):
-        try:
-            admin_id = kwargs.get('pk')
-            if not admin_id:
-                return Response(
-                    {"error": "Administrator ID is required"}, 
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-                
-            admin = Administrators.objects.get(id=admin_id)
-            admin_data = self.serializer_class(admin).data
-            return Response(admin_data, status=status.HTTP_200_OK)
-        except Administrators.DoesNotExist:
-            return Response(
-                {"error": "Administrator not found"}, 
-                status=status.HTTP_404_NOT_FOUND
-            )
-        except Exception as e:
-            return Response(
-                {"error": str(e)},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-    
+        admin_id = kwargs.get('pk')
+        if admin_id:
+            try:
+                admin = Administrators.objects.get(id=admin_id)
+                data = self.serializer_class(admin).data
+                return Response(data, status=status.HTTP_200_OK)
+            except Administrators.DoesNotExist:
+                return Response({"error": "Admin not found"}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            # Fetch all admins
+            admins = Administrators.objects.all()
+            data = self.serializer_class(admins, many=True).data
+            return Response(data, status=status.HTTP_200_OK)
+
     def delete(self, request, *args, **kwargs):
         try:
             admin_id = kwargs.get('pk')
