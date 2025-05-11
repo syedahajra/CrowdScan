@@ -5,12 +5,13 @@ import torch
 import torch.nn as nn
 import torchvision.transforms as transforms
 import mediapipe as mp
+from django.conf import settings
 
 from PIL import Image
 from .model import BiSeNet
 
 # Define paths
-MODEL_PATH = "/Users/rohan/Documents/University Docs/8th Semester/FYP-II/CrowdScan/crowdscan_be/models/79999_iter.pth"
+MODEL_PATH = settings.MODEL_PATH
 
 # Face parsing model init
 class FaceOcclusionDetector:

@@ -97,10 +97,17 @@ class CreateUpdateRetrieveDeleteAdminView(APIView):
 class AdminLoginView(APIView):
     def post(self, request):
         name = request.data.get('name')
+        email = request.data.get('email')
         password = request.data.get('password')
         
         try:
-            admin = Administrators.objects.get(name=name)
+            if not (name or email):
+                return Response({"error": "Name or email is required"}, status=status.HTTP_400_BAD_REQUEST)
+            if name:
+                admin = Administrators.objects.get(name=name)
+            else:
+                admin = Administrators.objects.get(email=email)
+            
             if not check_password(password, admin.password):  # Using check_password for secure comparison
                 return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
             
@@ -110,7 +117,7 @@ class AdminLoginView(APIView):
             # Generate session token
             token = jwt.encode({
                 'admin_id': admin.id,
-                'exp': datetime.utcnow() + timedelta(hours=24)
+                'exp': timezone.now() + timedelta(hours=24)
             }, settings.SECRET_KEY, algorithm='HS256')
             
             # Update admin session info

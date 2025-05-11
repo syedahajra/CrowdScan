@@ -49,3 +49,8 @@ add*
 
 # PyCache Files
 *.pyc*
+
+# Docker
+.dockerignore
+Dockerfile
+docker-compose.yml
