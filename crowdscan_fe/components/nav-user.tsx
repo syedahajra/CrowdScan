@@ -31,9 +31,26 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar();
   const router = useRouter();
-  const handleLogout = () => {
-    router.push("/login");
-  };
+  const handleLogout = async () => {
+  try {
+    const res = await fetch("/api/auth/logout", {
+      method: "POST",
+      credentials: "include", 
+    });
+
+    if (res.ok) {
+      // Optionally: redirect or show a toast
+      router.push("/login");
+    } else {
+      const error = await res.json();
+      console.error("Logout failed:", error);
+    }
+  } catch (err) {
+    console.error("Logout error:", err);
+  }
+};
+
+
   const handleAccount = () => {
     router.push("/account");
   };
@@ -48,7 +65,7 @@ export function NavUser({
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarFallback className="rounded-lg">SH</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">{user.name}</span>

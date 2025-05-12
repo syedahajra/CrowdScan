@@ -100,249 +100,264 @@ export default function ScanPage() {
   );
 
   const DetailsDialog = () => {
-  if (!viewingDetails) return null;
+    if (!viewingDetails) return null;
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-background rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6 space-y-6">
-          <div className="flex justify-between items-start">
-            <h2 className="text-2xl font-bold">
-              {viewingDetails.isUnknown ? "Unknown Person" : viewingDetails.name}
-            </h2>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={() => setViewingDetails(null)}
-            >
-              <X className="w-5 h-5" />
-            </Button>
-          </div>
-
-          {/* Side-by-Side Image Comparison */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Query Image */}
-<div className="space-y-2">
-  <h3 className="font-medium">Query Image</h3>
-  <div className="relative aspect-square border rounded-lg overflow-hidden">
-  {viewingDetails.query_image ? (
-    <img 
-      src={`data:image/jpeg;base64,${viewingDetails.query_image}`}
-      // {`data:image/jpeg;base64,${viewingDetails.image}`}
-      alt="Query image"
-      className="object-cover w-full h-full"
-    />
-  ) : (
-    <div className="bg-gray-100 w-full h-full flex items-center justify-center">
-      <span className="text-gray-400">No query image available</span>
-    </div>
-  )}
-</div>
-  {viewingDetails.occlusion_percentage !== undefined && (
-    <div className="text-sm">
-      <span className="text-muted-foreground">Occlusion: </span>
-      <span className="font-medium">
-        {viewingDetails.occlusion_percentage.toFixed(1)}%
-      </span>
-    </div>
-  )}
-</div>
-            {/* Matched Image */}
-            <div className="space-y-2">
-              <h3 className="font-medium">Matched Image</h3>
-              <div className="relative aspect-square border rounded-lg overflow-hidden">
-                <Image
-                  src={`data:image/jpeg;base64,${viewingDetails.image}`}
-                  alt="Matched image"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="text-sm">
-                <span className="text-muted-foreground">Similarity: </span>
-                <span className="font-medium">
-                  {viewingDetails.similarity.toFixed(1)}%
-                </span>
-              </div>
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-background rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="p-6 space-y-6">
+            <div className="flex justify-between items-start">
+              <h2 className="text-2xl font-bold">
+                {viewingDetails.isUnknown
+                  ? "Unknown Person"
+                  : viewingDetails.name}
+              </h2>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setViewingDetails(null)}
+              >
+                <X className="w-5 h-5" />
+              </Button>
             </div>
-          </div>
 
-          {/* Model-Specific Scores */}
-          <div className="space-y-4">
-            <h3 className="font-medium text-lg">Algorithm Scores</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* VGG-Face Score */}
-              <div className="border rounded-lg p-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500" />
-                  <span className="font-medium">VGG-Face</span>
-                </div>
-                {viewingDetails.model_scores?.["VGG-Face"] ? (
-                  <div className="mt-2">
-                    <Progress 
-                      value={viewingDetails.model_scores["VGG-Face"] * 100} 
-                      className="h-2" 
+            {/* Side-by-Side Image Comparison */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Query Image */}
+              <div className="space-y-2">
+                <h3 className="font-medium">Query Image</h3>
+                <div className="relative aspect-square border rounded-lg overflow-hidden">
+                  {viewingDetails.query_image ? (
+                    <img
+                      src={`data:image/jpeg;base64,${viewingDetails.query_image}`}
+                      // {`data:image/jpeg;base64,${viewingDetails.image}`}
+                      alt="Query image"
+                      className="object-cover w-full h-full"
                     />
-                    <div className="text-right text-sm mt-1">
-                      {(viewingDetails.model_scores["VGG-Face"] * 100).toFixed(1)}%
+                  ) : (
+                    <div className="bg-gray-100 w-full h-full flex items-center justify-center">
+                      <span className="text-gray-400">
+                        No query image available
+                      </span>
                     </div>
-                  </div>
-                ) : (
-                  <div className="text-sm text-muted-foreground mt-2">No score available</div>
-                )}
-              </div>
-
-              {/* ArcFace Score */}
-              <div className="border rounded-lg p-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                  <span className="font-medium">ArcFace</span>
+                  )}
                 </div>
-                {viewingDetails.model_scores?.["ArcFace"] ? (
-                  <div className="mt-2">
-                    <Progress 
-                      value={viewingDetails.model_scores["ArcFace"] * 100} 
-                      className="h-2" 
-                    />
-                    <div className="text-right text-sm mt-1">
-                      {(viewingDetails.model_scores["ArcFace"] * 100).toFixed(1)}%
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-sm text-muted-foreground mt-2">No score available</div>
-                )}
-              </div>
-
-              {/* SFace Score */}
-              <div className="border rounded-lg p-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-green-500" />
-                  <span className="font-medium">SFace</span>
-                </div>
-                {viewingDetails.model_scores?.["SFace"] ? (
-                  <div className="mt-2">
-                    <Progress 
-                      value={viewingDetails.model_scores["SFace"] * 100} 
-                      className="h-2" 
-                    />
-                    <div className="text-right text-sm mt-1">
-                      {(viewingDetails.model_scores["SFace"] * 100).toFixed(1)}%
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-sm text-muted-foreground mt-2">No score available</div>
-                )}
-              </div>
-            </div>
-          </div>
-
-              {/* Details Section */}
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-medium text-lg">Match Confidence</h3>
-                  <div className="flex items-center gap-4 mt-2">
-                    <Progress
-                      value={viewingDetails.similarity}
-                      className="h-2 flex-1"
-                    />
+                {viewingDetails.occlusion_percentage !== undefined && (
+                  <div className="text-sm">
+                    <span className="text-muted-foreground">Occlusion: </span>
                     <span className="font-medium">
-                      {viewingDetails.similarity.toFixed(1)}%
+                      {viewingDetails.occlusion_percentage.toFixed(1)}%
                     </span>
                   </div>
-                  <AlgorithmIndicators
-                    matchedModels={viewingDetails.matched_models}
+                )}
+              </div>
+              {/* Matched Image */}
+              <div className="space-y-2">
+                <h3 className="font-medium">Matched Image</h3>
+                <div className="relative aspect-square border rounded-lg overflow-hidden">
+                  <Image
+                    src={`data:image/jpeg;base64,${viewingDetails.image}`}
+                    alt="Matched image"
+                    fill
+                    className="object-cover"
                   />
-                  <p className="text-sm text-muted-foreground mt-2">
-                    {viewingDetails.matched_models.length === 3
-                      ? "High confidence (all algorithms matched)"
-                      : viewingDetails.matched_models.length === 2
-                      ? "Medium confidence (2 algorithms matched)"
-                      : "Single algorithm match"}
-                  </p>
+                </div>
+                <div className="text-sm">
+                  <span className="text-muted-foreground">Similarity: </span>
+                  <span className="font-medium">
+                    {viewingDetails.similarity.toFixed(1)}%
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Model-Specific Scores */}
+            <div className="space-y-4">
+              <h3 className="font-medium text-lg">Algorithm Scores</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* VGG-Face Score */}
+                <div className="border rounded-lg p-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-red-500" />
+                    <span className="font-medium">VGG-Face</span>
+                  </div>
+                  {viewingDetails.model_scores?.["VGG-Face"] ? (
+                    <div className="mt-2">
+                      <Progress
+                        value={viewingDetails.model_scores["VGG-Face"] * 100}
+                        className="h-2"
+                      />
+                      <div className="text-right text-sm mt-1">
+                        {(
+                          viewingDetails.model_scores["VGG-Face"] * 100
+                        ).toFixed(1)}
+                        %
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-sm text-muted-foreground mt-2">
+                      No score available
+                    </div>
+                  )}
                 </div>
 
-                <Separator />
+                {/* ArcFace Score */}
+                <div className="border rounded-lg p-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                    <span className="font-medium">ArcFace</span>
+                  </div>
+                  {viewingDetails.model_scores?.["ArcFace"] ? (
+                    <div className="mt-2">
+                      <Progress
+                        value={viewingDetails.model_scores["ArcFace"] * 100}
+                        className="h-2"
+                      />
+                      <div className="text-right text-sm mt-1">
+                        {(viewingDetails.model_scores["ArcFace"] * 100).toFixed(
+                          1
+                        )}
+                        %
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-sm text-muted-foreground mt-2">
+                      No score available
+                    </div>
+                  )}
+                </div>
 
-                {!viewingDetails.isUnknown ? (
-                  <>
-                    <div>
-                      <h3 className="font-medium text-lg">Personal Details</h3>
-                      <div className="mt-2 space-y-3">
-                        <div className="flex items-center gap-3">
-                          <Fingerprint className="w-5 h-5 text-muted-foreground" />
-                          <div>
-                            <p className="text-sm text-muted-foreground">
-                              CNIC
-                            </p>
-                            <p>
-                              {viewingDetails.cnic_number || "Not available"}
-                            </p>
-                          </div>
+                {/* SFace Score */}
+                <div className="border rounded-lg p-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-green-500" />
+                    <span className="font-medium">SFace</span>
+                  </div>
+                  {viewingDetails.model_scores?.["SFace"] ? (
+                    <div className="mt-2">
+                      <Progress
+                        value={viewingDetails.model_scores["SFace"] * 100}
+                        className="h-2"
+                      />
+                      <div className="text-right text-sm mt-1">
+                        {(viewingDetails.model_scores["SFace"] * 100).toFixed(
+                          1
+                        )}
+                        %
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-sm text-muted-foreground mt-2">
+                      No score available
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Details Section */}
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-medium text-lg">Match Confidence</h3>
+                <div className="flex items-center gap-4 mt-2">
+                  <Progress
+                    value={viewingDetails.similarity}
+                    className="h-2 flex-1"
+                  />
+                  <span className="font-medium">
+                    {viewingDetails.similarity.toFixed(1)}%
+                  </span>
+                </div>
+                <AlgorithmIndicators
+                  matchedModels={viewingDetails.matched_models}
+                />
+                <p className="text-sm text-muted-foreground mt-2">
+                  {viewingDetails.matched_models.length === 3
+                    ? "High confidence (all algorithms matched)"
+                    : viewingDetails.matched_models.length === 2
+                    ? "Medium confidence (2 algorithms matched)"
+                    : "Single algorithm match"}
+                </p>
+              </div>
+
+              <Separator />
+
+              {!viewingDetails.isUnknown ? (
+                <>
+                  <div>
+                    <h3 className="font-medium text-lg">Personal Details</h3>
+                    <div className="mt-2 space-y-3">
+                      <div className="flex items-center gap-3">
+                        <Fingerprint className="w-5 h-5 text-muted-foreground" />
+                        <div>
+                          <p className="text-sm text-muted-foreground">CNIC</p>
+                          <p>{viewingDetails.cnic_number || "Not available"}</p>
                         </div>
-                        <div className="flex items-center gap-3">
-                          <User className="w-5 h-5 text-muted-foreground" />
-                          <div>
-                            <p className="text-sm text-muted-foreground">
-                              Address
-                            </p>
-                            <p>{viewingDetails.address || "Not available"}</p>
-                          </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <User className="w-5 h-5 text-muted-foreground" />
+                        <div>
+                          <p className="text-sm text-muted-foreground">
+                            Address
+                          </p>
+                          <p>{viewingDetails.address || "Not available"}</p>
                         </div>
                       </div>
                     </div>
-
-                    <Separator />
-                  </>
-                ) : (
-                  <div className="flex items-start gap-3">
-                    <FileDigit className="w-5 h-5 text-muted-foreground mt-0.5" />
-                    <div>
-                      <h3 className="font-medium text-lg">Note</h3>
-                      <p className="text-muted-foreground">
-                        {viewingDetails.description ||
-                          "This is a potential match that requires verification"}
-                      </p>
-                    </div>
                   </div>
-                )}
 
-                <div>
-                  <h3 className="font-medium text-lg">Matching Algorithms</h3>
-                  <div className="mt-2 flex gap-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-red-500" />
-                      <span className="text-sm">
-                        {viewingDetails.matched_models.includes("VGG-Face")
-                          ? "VGG-Face"
-                          : "Not matched"}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                      <span className="text-sm">
-                        {viewingDetails.matched_models.includes("ArcFace")
-                          ? "ArcFace"
-                          : "Not matched"}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-green-500" />
-                      <span className="text-sm">
-                        {viewingDetails.matched_models.includes("SFace")
-                          ? "SFace"
-                          : "Not matched"}
-                      </span>
-                    </div>
+                  <Separator />
+                </>
+              ) : (
+                <div className="flex items-start gap-3">
+                  <FileDigit className="w-5 h-5 text-muted-foreground mt-0.5" />
+                  <div>
+                    <h3 className="font-medium text-lg">Note</h3>
+                    <p className="text-muted-foreground">
+                      {viewingDetails.description ||
+                        "This is a potential match that requires verification"}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <h3 className="font-medium text-lg">Matching Algorithms</h3>
+                <div className="mt-2 flex gap-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-red-500" />
+                    <span className="text-sm">
+                      {viewingDetails.matched_models.includes("VGG-Face")
+                        ? "VGG-Face"
+                        : "Not matched"}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                    <span className="text-sm">
+                      {viewingDetails.matched_models.includes("ArcFace")
+                        ? "ArcFace"
+                        : "Not matched"}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-green-500" />
+                    <span className="text-sm">
+                      {viewingDetails.matched_models.includes("SFace")
+                        ? "SFace"
+                        : "Not matched"}
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            <div className="pt-4 flex justify-end">
-              <Button onClick={() => setViewingDetails(null)}>Close</Button>
-            </div>
+          <div className="pt-4 flex justify-end">
+            <Button onClick={() => setViewingDetails(null)}>Close</Button>
           </div>
         </div>
+      </div>
     );
   };
   const handleDrop = (acceptedFiles: File[]) => {
