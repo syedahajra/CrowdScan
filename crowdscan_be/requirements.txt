@@ -1,0 +1,29 @@
+# Django & Backend
+Django>=4.2,<5.0
+djangorestframework>=3.14.0
+psycopg
+django-environ>=0.10.0
+django-cors-headers>=4.3.1
+requests==2.31.0
+
+# Image & ML Utils
+numpy==1.24
+pandas==2.0.3
+Pillow==9.0.0
+opencv-python==4.9.0.80
+scikit-learn>=1.3.0
+
+# Deep Learning
+tensorflow==2.13.1
+keras==2.13.1
+deepface
+
+# Occlusion Detection
+torch==2.0.1
+torchvision==0.15.2
+mediapipe==0.10.9
+ultralytics
+gunicorn
+
+# Session Management
+jwt
