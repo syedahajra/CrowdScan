@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-export const runtime = 'edge';
+// export const runtime = 'edge';
 
 // Define TypeScript interfaces for the API responses
 interface DjangoMatch {
@@ -107,7 +107,7 @@ export async function POST(request: Request) {
 
     // Transform each image result with its matches
     const transformedResults = results.map((result: any, index: number) => {
-  const matches = result.matches?.map((match: any) => {
+      const matches = result.matches?.map((match: any) => {
         // Convert matched_models to the required frontend format
         const modelScores: Record<string, number> = {};
         const modelNames: string[] = [];
@@ -123,8 +123,8 @@ export async function POST(request: Request) {
         }
 
         return {
-      ...match,
-      query_image: `data:image/jpeg;base64,${result.query_image}`,
+          ...match,
+          query_image: `data:image/jpeg;base64,${result.query_image}`,
           similarity: (match.similarity || 0) * 100,
           isUnknown: (match.similarity || 0) < thresholdValue,
           description: (match.similarity || 0) < thresholdValue
@@ -142,8 +142,8 @@ export async function POST(request: Request) {
 
       return {
         image_index: index,
-    query_image: `data:image/jpeg;base64,${result.query_image}`,
-    matches: matches || []
+        query_image: `data:image/jpeg;base64,${result.query_image}`,
+        matches: matches || []
       };
     });
     // Flatten and sort matches
