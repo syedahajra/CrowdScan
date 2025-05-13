@@ -401,6 +401,7 @@ export default function ScanPage() {
 
       setMatches(matchesWithQueryImages);
       setShowResults(true);
+      toast.success("Matches Retrieved!");
     } catch (error) {
       console.error("Scan error:", error);
       toast.error("Scan failed. Please try again.");
@@ -420,8 +421,8 @@ export default function ScanPage() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset className="min-h-screen flex flex-col">
-        <header className="flex h-16 items-center gap-2">
-          <div className="flex items-center gap-2 px-4">
+        <header className="flex h-16 items-center border-b gap-2">
+          <div className="flex items-center gap-2  px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
             <Breadcrumb>
@@ -439,6 +440,9 @@ export default function ScanPage() {
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
+          </div>
+          <div className="ml-auto">
+            <ModeToggle />
           </div>
         </header>
 
@@ -551,7 +555,11 @@ export default function ScanPage() {
           ) : (
             <>
               {/* Scan View */}
-              <h1 className="text-3xl font-bold">Match Faces</h1>
+              <h1 className="text-3xl font-bold text-transparent">
+                <span className="bg-gradient-to-r from-primary to-blue-600 bg-clip-text inline-block w-[300px]">
+                  Match Faces
+                </span>
+              </h1>
               <p className="text-muted-foreground">
                 Upload images to scan against the database
               </p>
@@ -615,7 +623,7 @@ export default function ScanPage() {
               <Button
                 onClick={handleScan}
                 disabled={files.length === 0 || isScanning}
-                className="w-full"
+                className="w-full bg-gradient-to-r from-primary to-blue-600 text-white hover:brightness-110"
               >
                 {isScanning ? (
                   "Scanning..."
@@ -631,7 +639,6 @@ export default function ScanPage() {
         </div>
       </SidebarInset>
       <DetailsDialog />
-      <ModeToggle />
     </SidebarProvider>
   );
 }

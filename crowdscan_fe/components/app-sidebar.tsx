@@ -6,9 +6,9 @@ import {
   LayoutDashboard,
   ScanSearch,
   Users,
-  CircleHelp
+  CircleHelp,
 } from "lucide-react";
-import Image from "next/image"; // Add this import
+import Image from "next/image";
 import { NavMain } from "@/components/nav-main";
 import { NavProjects } from "@/components/nav-projects";
 import { NavUser } from "@/components/nav-user";
@@ -21,60 +21,67 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 
-// This is sample data.
-const data = {
-  user: {
-    name: "Syeda Hajra",
-    email: "admin@eaxee.com",
-    avatar: "",
-  },
-  teams: [
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const [user, setUser] = React.useState({
+    name: "Loading...",
+    email: "",
+    avatar: "", // Optional
+    role: "", // Add this
+  });
+
+  React.useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/auth/check-session", {
+          method: "GET",
+          credentials: "include", // IMPORTANT to send cookies
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setUser({
+            name: data.name,
+            email: data.email,
+            avatar: "", // Optional: you can update this
+            role: data.role, // Capture role from response
+          });
+        } else {
+          console.error("Session check failed:", data.error);
+        }
+      } catch (err) {
+        console.error("Error fetching session:", err);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  const teams = [
     {
       name: "CrowdScan",
-      logo: "/logo-removebg.png", // Changed from icon to image path
+      logo: "/logo-removebg.png",
       plan: "Face Recognition System",
     },
-  ],
-  navMain: [
-    {
-      title: "Dashboard",
-      url: "dashboard",
-      icon: LayoutDashboard,
-    },
-    {
-      title: "Upload to Database",
-      url: "/UploadImages",
-      icon: CloudUpload,
-      isActive: true,
-    },
-    {
-      title: "Match Faces",
-      url: "scan",
-      icon: ScanSearch,
-    },
-  ],
-  projects: [
-    {
-      name: "Manage Users",
-      url: "manageUsers",
-      icon: Users,
-    },
-    {
-      name: "How it works",
-      url: "Manual",
-      icon: CircleHelp,
-    },
-  ],
-};
+  ];
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const navMain = [
+    { title: "Dashboard", url: "dashboard", icon: LayoutDashboard },
+    { title: "Upload to Database", url: "/UploadImages", icon: CloudUpload },
+    { title: "Match Faces", url: "scan", icon: ScanSearch },
+  ];
+
+  const projects = [
+  ...(user.role === "admin"
+    ? [{ name: "Manage Users", url: "manageUsers", icon: Users }]
+    : []),
+  { name: "How it works", url: "Manual", icon: CircleHelp },
+];
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher 
-          teams={data.teams.map(team => ({
+        <TeamSwitcher
+          teams={teams.map((team) => ({
             ...team,
-            // Custom renderer for the logo
             renderLogo: () => (
               <div className="relative h-8 w-8">
                 <Image
@@ -84,16 +91,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   className="object-contain"
                 />
               </div>
-            )
-          }))} 
+            ),
+          }))}
         />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <NavMain items={navMain} />
+        <NavProjects projects={projects} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

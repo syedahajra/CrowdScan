@@ -1,44 +1,44 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { 
-  PlusCircle, 
-  Users, 
-  UserPlus, 
-  UserCog, 
+import {
+  PlusCircle,
+  Users,
+  UserPlus,
+  UserCog,
   Trash2,
   Mail,
-  Key, 
+  Key,
   LoaderCircle,
   Eye,
-  EyeOff
+  EyeOff,
 } from "lucide-react";
 import { toast } from "sonner";
 import { AppSidebar } from "@/components/app-sidebar";
-import { 
+import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
-import { 
+import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
-  BreadcrumbSeparator
+  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { 
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -47,7 +47,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -82,18 +82,22 @@ export default function ManageUsersPage() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch('/api/users');
-        if (!response.ok) throw new Error('Failed to fetch users');
+        const response = await fetch("/api/users");
+        if (!response.ok) throw new Error("Failed to fetch users");
         const data = await response.json();
-        setUsers(data.map((user: any) => ({
-          id: user.id.toString(),
-          name: user.name,
-          email: user.email,
-          role: user.role === 'admin' ? 'admin' : 'regular',
-          lastActive: user.last_login || 'Never'
-        })));
+        setUsers(
+          data.map((user: any) => ({
+            id: user.id.toString(),
+            name: user.name,
+            email: user.email,
+            role: user.role === "admin" ? "admin" : "regular",
+            lastActive: user.last_login || "Never",
+          }))
+        );
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : 'Failed to load users');
+        toast.error(
+          error instanceof Error ? error.message : "Failed to load users"
+        );
       } finally {
         setIsLoading(false);
       }
@@ -113,33 +117,36 @@ export default function ManageUsersPage() {
     }
 
     try {
-      const response = await fetch('/api/users', {
-        method: 'POST',
+      const response = await fetch("/api/users", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           name: newUser.name,
           email: newUser.email,
           password: newUser.password,
-          role: newUser.role === 'admin' ? 'admin' : 'officer'
-        })
+          role: newUser.role === "admin" ? "admin" : "officer",
+        }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create user');
+        throw new Error(errorData.error || "Failed to create user");
       }
 
       const createdUser = await response.json();
-      
-      setUsers([...users, {
-        id: createdUser.id.toString(),
-        name: createdUser.name,
-        email: createdUser.email,
-        role: createdUser.role === 'admin' ? 'admin' : 'regular',
-        lastActive: 'Never'
-      }]);
+
+      setUsers([
+        ...users,
+        {
+          id: createdUser.id.toString(),
+          name: createdUser.name,
+          email: createdUser.email,
+          role: createdUser.role === "admin" ? "admin" : "regular",
+          lastActive: "Never",
+        },
+      ]);
 
       toast.success("User created successfully");
       setIsDialogOpen(false);
@@ -147,27 +154,31 @@ export default function ManageUsersPage() {
         name: "",
         email: "",
         password: "",
-        role: "regular"
+        role: "regular",
       });
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to create user');
+      toast.error(
+        error instanceof Error ? error.message : "Failed to create user"
+      );
     }
   };
 
   const deleteUser = async (id: string) => {
     try {
       const response = await fetch(`/api/users?id=${id}`, {
-        method: 'DELETE'
+        method: "DELETE",
       });
 
       if (!response.ok) {
-        throw new Error('Failed to delete user');
+        throw new Error("Failed to delete user");
       }
 
-      setUsers(users.filter(user => user.id !== id));
+      setUsers(users.filter((user) => user.id !== id));
       toast.success("User deleted successfully");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to delete user');
+      toast.error(
+        error instanceof Error ? error.message : "Failed to delete user"
+      );
     }
   };
 
@@ -199,11 +210,14 @@ export default function ManageUsersPage() {
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold flex items-center gap-2">
               <Users className="h-6 w-6" />
-              User Management
+              <span className="bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent inline-block w-[300px]">
+                User Management
+              </span>
             </h1>
+
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
-                <Button>
+                <Button className="bg-gradient-to-r from-primary to-blue-600 text-white hover:brightness-110">
                   <UserPlus className="h-4 w-4 mr-2" />
                   Add User
                 </Button>
@@ -282,8 +296,8 @@ export default function ManageUsersPage() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <Button 
-                    className="w-full mt-4" 
+                  <Button
+                    className="w-full mt-4"
                     onClick={handleAddUser}
                     disabled={isLoading}
                   >
@@ -329,18 +343,26 @@ export default function ManageUsersPage() {
                       <TableCell className="font-medium">{user.name}</TableCell>
                       <TableCell>{user.email}</TableCell>
                       <TableCell>
-                        <Badge 
-                          variant={user.role === "admin" ? "default" : "secondary"}
-                          className="flex items-center gap-1 w-20 justify-center"
+                        <Badge
+                          variant={
+                            user.role === "admin" ? "default" : "secondary"
+                          }
+                          className={`flex items-center gap-1 w-20 justify-center ${
+                            user.role === "admin"
+                              ? "bg-gradient-to-r from-primary to-blue-600 text-white "
+                              : ""
+                          }`}
                         >
                           {user.role === "admin" ? (
                             <UserCog className="h-3 w-3" />
                           ) : (
                             <Users className="h-3 w-3" />
                           )}
-                          {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                          {user.role.charAt(0).toUpperCase() +
+                            user.role.slice(1)}
                         </Badge>
                       </TableCell>
+
                       <TableCell>{user.lastActive}</TableCell>
                       <TableCell>
                         <Button
@@ -361,7 +383,10 @@ export default function ManageUsersPage() {
           </div>
 
           <div className="text-sm text-muted-foreground">
-            <p>Total users: {users.length} (Admins: {users.filter(u => u.role === "admin").length})</p>
+            <p>
+              Total users: {users.length} (Admins:{" "}
+              {users.filter((u) => u.role === "admin").length})
+            </p>
           </div>
         </main>
       </SidebarInset>

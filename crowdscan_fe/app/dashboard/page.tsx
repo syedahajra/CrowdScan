@@ -27,7 +27,7 @@ import {
   Users,
   SlidersHorizontal,
   AlertCircle,
-  Camera
+  Camera,
 } from "lucide-react";
 import { ModeToggle } from "@/components/theme-toggler";
 
@@ -47,7 +47,10 @@ export default function DashboardPage() {
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
-          </div><ModeToggle/>
+          </div>
+          <div className="ml-auto">
+            <ModeToggle />
+          </div>
         </header>
 
         <main className="p-6">
@@ -116,27 +119,25 @@ export default function DashboardPage() {
 
             {/* Right Column */}
             <div className="lg:col-span-2">
-              <div className="relative h-full bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl overflow-hidden flex items-center justify-center p-4">
+              <div className="relative h-full bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl overflow-hidden flex items-center justify-center p-4 dark:bg-transparent dark:bg-none">
                 {/* Decorative elements */}
-                <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-primary/10 blur-xl"></div>
-                <div className="absolute bottom-10 left-10 w-32 h-32 rounded-full bg-purple-500/10 blur-lg"></div>
-                
+                <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-primary/10 blur-xl dark:bg-transparent"></div>
+                <div className="absolute bottom-10 left-10 w-32 h-32 rounded-full bg-purple-500/10 blur-lg dark:bg-transparent"></div>
+
                 {/* Centered Lottie Animation */}
                 <div className="relative z-10 w-full h-full flex items-center justify-center">
-                  <Lottie 
-                    animationData={scanAnimation} 
+                  <Lottie
+                    animationData={scanAnimation}
                     loop={true}
                     autoplay={true}
                     className="w-full h-auto max-h-[500px]" // Responsive sizing
                   />
                 </div>
-                </div>
+              </div>
             </div>
           </div>
         </main>
-        
       </SidebarInset>
-      
     </SidebarProvider>
   );
 }

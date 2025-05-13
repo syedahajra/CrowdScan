@@ -1,5 +1,12 @@
 "use client";
-import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
+
+import { useEffect, useState } from "react";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,27 +22,53 @@ import {
 import {
   Breadcrumb,
   BreadcrumbItem,
-  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Lock, Mail, User, Shield, Check, X , Badge} from "lucide-react";
+import { Lock, Mail, User, Shield, X, Badge } from "lucide-react";
+import { ModeToggle } from "@/components/theme-toggler";
 
 export default function AccountPage() {
-  // Placeholder user data
-  const user = {
-    name: "Admin User",
-    email: "admin@crowdscan.com",
-    role: "Administrator",
-    lastLogin: "2023-11-15 14:30",
-    avatar: "/avatars/admin.png" // Leave empty for fallback
-  };
+  const [user, setUser] = useState({
+    name: "Loading...",
+    email: "loading@domain.com",
+    role: "Loading",
+    avatar: "/avatars/admin.png",
+  });
 
-  const handlePasswordChange = (e: React.FormEvent) => {
+  useEffect(() => {
+    const fetchUserSession = async () => {
+      try {
+        const res = await fetch("/api/auth/check-session", {
+          method: "GET",
+          credentials: "include",
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setUser((prev) => ({
+            ...prev,
+            name: data.name,
+            email: data.email,
+            role: data.role,
+          }));
+        } else {
+          toast.error(data.error || "Session check failed");
+        }
+      } catch (err) {
+        toast.error("Failed to load session info");
+      }
+    };
+
+    fetchUserSession();
+  }, []);
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
     const form = e.currentTarget as HTMLFormElement;
     const formData = new FormData(form);
-    
+
     const currentPassword = formData.get("currentPassword");
     const newPassword = formData.get("newPassword");
     const confirmPassword = formData.get("confirmPassword");
@@ -47,18 +80,32 @@ export default function AccountPage() {
       return;
     }
 
-    // Simulate API call
-    toast.promise(
-      new Promise((resolve) => setTimeout(resolve, 1000)),
-      {
-        loading: "Updating password...",
-        success: () => {
+    try {
+      toast.promise(
+        fetch("/api/auth/change-password/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            currentPassword,
+            newPassword,
+          }),
+        }).then(async (res) => {
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || "Password update failed");
           form.reset();
-          return "Password updated successfully";
-        },
-        error: "Failed to update password",
-      }
-    );
+        }),
+        {
+          loading: "Updating password...",
+          success: "Password updated successfully",
+          error: (err) => err.message || "Failed to update password",
+        }
+      );
+    } catch (error) {
+      console.error("Password update failed:", error);
+    }
   };
 
   return (
@@ -71,11 +118,20 @@ export default function AccountPage() {
             <Separator orientation="vertical" className="mr-2 h-4" />
             <Breadcrumb>
               <BreadcrumbList>
+                <BreadcrumbItem className="hidden md:block">
+                  <BreadcrumbLink href="dashboard">
+                    Face Recogntion System
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
                   <BreadcrumbPage>My Account</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
+          </div>
+          <div className="ml-auto">
+            <ModeToggle />
           </div>
         </header>
 
@@ -93,24 +149,24 @@ export default function AccountPage() {
                 <div className="flex items-center gap-4">
                   <Avatar className="h-16 w-16">
                     <AvatarImage src={user.avatar} />
-                    <AvatarFallback className="bg-primary text-white">
+                    <AvatarFallback className="text-xl">
                       {user.name.charAt(0)}
                     </AvatarFallback>
                   </Avatar>
+
                   <div className="space-y-1">
-                    <p className="font-medium">{user.name}</p>
+                    <p className="font-medium text-base flex items-center gap-1">
+                      {user.name}
+                    </p>
+
                     <p className="text-sm text-muted-foreground flex items-center gap-1">
                       <Mail className="h-4 w-4" />
                       {user.email}
                     </p>
-                    <div className="flex items-center gap-2">
-                      <Badge  className="flex items-center gap-1">
-                        <Shield className="h-3 w-3" />
-                        {user.role}
-                      </Badge>
-                      <p className="text-xs text-muted-foreground">
-                        Last login: {user.lastLogin}
-                      </p>
+
+                    <div className="text-sm text-muted-foreground flex items-center gap-1">
+                      <Shield className="h-4 w-4" />
+                      {user.role}
                     </div>
                   </div>
                 </div>
@@ -149,7 +205,9 @@ export default function AccountPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                    <Label htmlFor="confirmPassword">
+                      Confirm New Password
+                    </Label>
                     <Input
                       id="confirmPassword"
                       name="confirmPassword"
@@ -160,9 +218,7 @@ export default function AccountPage() {
                     />
                   </div>
                   <CardFooter className="flex justify-end px-0 pb-0 pt-4">
-                    <Button type="submit">
-                      Update Password
-                    </Button>
+                    <Button type="submit">Update Password</Button>
                   </CardFooter>
                 </form>
               </CardContent>
@@ -176,7 +232,9 @@ export default function AccountPage() {
               </h3>
               <ul className="space-y-1 list-disc pl-5">
                 <li>Use a unique password you don't use elsewhere</li>
-                <li>Include numbers, symbols, and both uppercase/lowercase letters</li>
+                <li>
+                  Include numbers, symbols, and both uppercase/lowercase letters
+                </li>
                 <li>Consider using a password manager</li>
               </ul>
             </div>
