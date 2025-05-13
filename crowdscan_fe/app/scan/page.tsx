@@ -122,9 +122,9 @@ export default function ScanPage() {
             </div>
 
             {/* Side-by-Side Image Comparison */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6"> */}
               {/* Query Image */}
-              <div className="space-y-2">
+              {/* <div className="space-y-2">
                 <h3 className="font-medium">Query Image</h3>
                 <div className="relative aspect-square border rounded-lg overflow-hidden">
                   {viewingDetails.query_image ? (
@@ -150,7 +150,7 @@ export default function ScanPage() {
                     </span>
                   </div>
                 )}
-              </div>
+              </div> */}
               {/* Matched Image */}
               <div className="space-y-2">
                 <h3 className="font-medium">Matched Image</h3>
@@ -169,7 +169,7 @@ export default function ScanPage() {
                   </span>
                 </div>
               </div>
-            </div>
+            {/* </div> */}
 
             {/* Model-Specific Scores */}
             <div className="space-y-4">
