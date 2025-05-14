@@ -98,7 +98,7 @@ export default function UploadPage() {
 
       if (activeTab === "known") {
         payload.name = name || "Unknown";
-        payload.cnic = cnic || "NA";
+        payload.cnic = cnic ? cnic.replace(/-/g, "") : "NA";
         payload.address = address || "NA";
       } else {
         payload.name = "Unknown";
