@@ -17,6 +17,14 @@ CrowdScan is a lightweight and efficient facial recognition system built using P
 - 🌐 **Web-Based Interface**  
   Simple and user-friendly frontend for officers or administrators to interact with the system.
 
+-⚙️ **Adjustable Threshold Sensitivity**  
+  Users can set a custom similarity threshold to adjust recognition sensitivity (e.g., for stricter or more lenient matches).
+
+-👥 **Role-Based Access Control**  
+  Supports multiple user types:
+  - **Administrators**: Full access, including user management (e.g., adding managers)
+  - **Officers**: Operational access to recognition tools, but no user creation rights
+
 - 🧠 **Pretrained Models**  
   No need for heavy training—uses DeepFace’s optimized backends for out-of-the-box accuracy.
 
