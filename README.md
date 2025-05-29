@@ -1,5 +1,10 @@
 # CrowdScan 👁️‍🗨️
 🌐 [Live Demo](https://crowdscan-fe.vercel.app/)
+
+## Demo Video
+Watch the demo of CrowdScan (Facial Recognition System) here:
+(https://drive.google.com/file/d/16fcxGoQoAo9weHQLPLGfK4V4-68TcFFK/view?usp=sharing)
+
 CrowdScan is a lightweight and efficient facial recognition system built using Python, Nextjs and the DeepFace library. Designed to assist law enforcement agencies, it enables fast and contactless suspect identification by matching faces against an existing database.
 
 ## 🚀 Features
